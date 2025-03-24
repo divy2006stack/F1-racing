@@ -1,133 +1,120 @@
+import mysql.connector as my
+
+def connect_to_database():
+    return my.connect(host="localhost", user="root", passwd="s", auth_plugin="mysql_native_password", database="f1_racing")
+
 def menu():
-    print()
-    print("*"*200)
-    print("-"*200)
-    print("*"*200)
-    print("Formula 1 Racing Management".center(200))
-    print("*"*200)
-    c=input("Press y to continue:")
-    if c=='y':
-        a=input("Enter your Name:")
-        print("Welcome",a,"to the world of F1 racing")
-        print("Let's get started")
-        while(c=='y'):
-            print("*"*150)
-            print("*"*150)
-            print("1. Show Race Details")
-            print("2. Update Race Details")
-            print("3. Show participating_teams")
-            print("4. Show types_of_seat")
-            print("5. Show food menu")
-            print("6. Search food item by name")
-            print("7. Update price of food item")
-            print("8. Add food item detail")
-            print("9. Delete food item from menu")
-            print("10. Show type of seat  chosen by viewer and its price")
-            print("11. If food item ordered then its bill")
-            print("12. Check out our season membership for year 2023")
-            print("13. Add new paticipating_team")
-            print("14. Message from F1 Team")
-            print("15. Exit")
-            opt=""
-            opt=int(input("Enter your choice:"))
-            if opt==1:
-                show_race_details()
-            elif opt==2:
-                update_race()
-            elif opt==3:
-                participating_teams()
-            elif opt==4:
-                Seat_type()
-            elif opt==5:
-                food_menu()
-            elif opt==6:
-                search_food()
-            elif opt==7:
-                update_food()
-            elif opt==8:
-                add_food()
-            elif opt==9:
-                delete_food()
-            elif opt==10:
-                seat_reservation()
-            elif opt==11:
-                food_bill()
-            elif opt==12:
-                membership()
-            elif opt==13:
-                add_team()
-            elif opt==14:
-                message()
-            elif opt==15:
-                print("Exiting the programme...")
-                break
-            else:
-                print("---------INVALID OPTION----------")
-    else:
-        print("Exiting the programme...")
-
-
-
-
-
-def show_race_details():
-    import mysql.connector as my
-    con=my.connect(host="localhost",user="root",passwd="star",auth_plugin="mysql_native_password",database="f1_racing")
-    c1=con.cursor()
-    c1.execute("select * from race_details")
-    res=c1.fetchall()
-    for i in res:
-        print(i)
-    con.close()
-
-def update_race():
-    import mysql.connector as my
-    con=my.connect(host="localhost",user="root",passwd="star",auth_plugin="mysql_native_password",database="f1_racing")
-    c1=con.cursor()
-    while True:
-        a=input("What do you want to update in race details?(Date/Destination/Both):")
-        if a=="Date":
-            dst=input("Enter destination of race whose date is to be updated:")
-            dt=input("Enter new date of race:")
-            query="Update race_details set Date='{0}' where Destination='{1}'".format(dt,dst)
-            c1.execute(query)
-            con.commit()
-            print("Date of race updated...")
-        elif a=="Destination":
-            dst=input("Enter the current destination of race which is to be updated:")
-            dst1=input("Enter new destination of race:")
-            query="Update race_details set Destination='{0}' where Destination='{1}'".format(dst1,dst)
-            c1.execute(query)
-            con.commit()
-            print("Destination of the race updated...")
-        elif a=="Both":
-            dst=input("Enter the current Destination of the race whose records are to be updated:")
-            dst1=input("Enter new destination:")
-            dt=input("Enter new date of race:")
-            query="Update race_details set Date='{0}',Destination='{1}' where Destination='{2}'".format(dt,dst1,dst)
-            c1.execute(query)
-            con.commit()
-            print("Destination and Date of the race updated...")
+    try:
+        con = connect_to_database()
+        print("*" * 200)
+        print("Formula 1 Racing Management".center(200))
+        print("*" * 200)
+        c = input("Press y to continue: ")
+        
+        if c == 'y':
+            name = input("Enter your Name: ")
+            print("Welcome", name, "to the world of F1 racing")
+            print("Let's get started")
+            
+            while True:
+                print("*" * 150)
+                print("1. Show Race Details")
+                if name.lower() == "admin":
+                    print("2. Update Race Details")
+                print("3. Show participating teams")
+                print("4. Show types of seat")
+                print("5. Show food menu")
+                print("6. Search food item by name")
+                if name.lower() == "admin":
+                    print("7. Update price of food item")
+                    print("8. Add food item detail")
+                    print("9. Delete food item from menu")
+                print("10. Show type of seat chosen by viewer and its price")
+                print("11. If food item ordered then its bill")
+                print("12. Check out our season membership for year 2023")
+                print("13. Add new participating team")
+                print("14. Message from F1 Team")
+                print("15. Exit")
+                
+                opt = int(input("Enter your choice: "))
+                
+                if opt == 1:
+                    show_race_details(con)
+                elif opt == 2 and name.lower() == "admin":
+                    update_race(con)
+                elif opt == 3:
+                    participating_teams(con)
+                elif opt == 4:
+                    seat_type(con)
+                elif opt == 5:
+                    food_menu(con)
+                elif opt == 6:
+                    search_food(con)
+                elif opt == 7 and name.lower() == "admin":
+                    update_food(con)
+                elif opt == 8 and name.lower() == "admin":
+                    add_food(con)
+                elif opt == 9 and name.lower() == "admin":
+                    delete_food(con)
+                elif opt == 10:
+                    seat_reservation()
+                elif opt == 11:
+                    food_bill()
+                elif opt == 12:
+                    membership()
+                elif opt == 13:
+                    add_team(con)
+                elif opt == 14:
+                    message()
+                elif opt == 15:
+                    print("Exiting the program...")
+                    break
+                else:
+                    print("---------INVALID OPTION OR UNAUTHORIZED ACCESS----------")
         else:
-            print("Invalid choice entered...")
-        b=input("Do you want to update more race details?(yes/no):")
-        if b=="no":
-            break
+            print("Exiting the program...")
+    
+    except my.Error as e:
+        print(f"Error connecting to MySQL: {e}")
 
+    finally:
+        if 'con' in locals():
+            con.close()
 
+def show_race_details(con):
+    try:
+        c1 = con.cursor()
+        c1.execute("SELECT * FROM race_details")
+        res = c1.fetchall()
+        for i in res:
+            print(i)
+    except my.Error as e:
+        print(f"Error fetching race details: {e}")
 
-def participating_teams():
-    import mysql.connector as my
-    con=my.connect(host="localhost",user="root",passwd="star",auth_plugin="mysql_native_password",database="f1_racing")
-    c1=con.cursor()
-    c1.execute("Select * from participating_teams")
-    res=c1.fetchall()
-    for i in res:
-        print(i)
-    con.close()
+def update_race(con):
+    try:
+        c1 = con.cursor()
+        while True:
+            a = input("What do you want to update in race details? (Date/Destination/Both): ")
+            if a.lower() == "date":
+                dst = input("Enter destination of race whose date is to be updated: ")
+                dt = input("Enter new date of race: ")
+                query = "UPDATE race_details SET Date='{0}' WHERE Destination='{1}'".format(dt, dst)
+                c1.execute(query)
+                con.commit()
+                print("Date of race updated...")
+    except my.Error as e:
+        print(f"Error updating race details: {e}")
 
-
-
+def participating_teams(con):
+    try:
+        c1 = con.cursor()
+        c1.execute("SELECT * FROM participating_teams")
+        res = c1.fetchall()
+        for i in res:
+            print(i)
+    except my.Error as e:
+        print(f"Error fetching participating teams: {e}")
 def Seat_type():
     import mysql.connector as my
     con=my.connect(host="localhost",user="root",passwd="star",auth_plugin="mysql_native_password",database="f1_racing")
@@ -340,5 +327,5 @@ def message():
                                                                         A WARM MESSAGE FROM F1 TEAM...'''
     print(m)
 
-menu()
 
+menu()
